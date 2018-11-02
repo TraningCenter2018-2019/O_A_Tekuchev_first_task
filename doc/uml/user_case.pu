@@ -1,0 +1,18 @@
+@startuml
+
+actor User
+actor Creator
+actor System
+
+rectangle Application {
+    User -up--> (Resolve\ncrossword) 
+
+    Creator -up--> (Create\ncrosswords)
+
+    System -up--> (Manage\ncrosswords)    
+    
+
+}
+
+@enduml
+

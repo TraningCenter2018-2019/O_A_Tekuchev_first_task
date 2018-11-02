@@ -1,0 +1,26 @@
+@startuml
+    interface "IView"
+    interface "IPresenter"
+    interface "IGenerator"
+    interface "IStorage"
+
+    component [View]
+    component [Presenter]
+    component [Model]
+    component [Storage]
+    component [Generator]
+    component [Library]
+
+    IView - View
+    IPresenter - Presenter
+    IGenerator - Generator
+    IStorage - Storage
+    
+    Presenter ..> IView    
+    Presenter ..> Model
+    Model ..> IStorage
+    Model ..> IGenerator
+    View ..> Library
+
+@enduml
+
