@@ -16,11 +16,12 @@
     IGenerator - Generator
     IStorage - Storage
     
-    Presenter ..> IView    
-    Presenter ..> Model
+    Presenter ..> IView : response   
+    Presenter ..> Model : "getting data"
     Model ..> IStorage
     Model ..> IGenerator
     View ..> Library
+    View ..> IPresenter : request
 
 @enduml
 

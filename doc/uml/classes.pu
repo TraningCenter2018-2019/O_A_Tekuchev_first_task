@@ -1,0 +1,32 @@
+@startuml
+
+package presenters {
+    interface IPresenter
+    class Presenter
+
+    IPresenter <|-- Presenter
+}
+
+Presenter o-- views.IView
+views.View o-- IPresenter
+
+package views {
+    interface IView
+    interface IInput
+    interface IOutput
+    class ConsoleInput
+    class ConsoleOutput
+    class View
+    
+    IView <|-- View    
+    View o-- IInput
+    View o-- IOutput    
+    IInput <|-- ConsoleInput
+    IOutput <|-- ConsoleOutput
+}
+
+package model {
+    
+}
+
+@enduml
