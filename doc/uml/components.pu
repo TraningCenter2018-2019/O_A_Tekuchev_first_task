@@ -3,11 +3,13 @@
     interface "IPresenter"
     interface "IGenerator"
     interface "IStorage"
+    interface "IGame"
 
     component [View]
     component [Presenter]
     component [Model]
     component [Storage]
+    component [Game]
     component [Generator]
     component [Library]
 
@@ -15,11 +17,13 @@
     IPresenter - Presenter
     IGenerator - Generator
     IStorage - Storage
+    IGame - Game
     
     Presenter ..> IView : response   
     Presenter ..> Model : "getting data"
-    Model ..> IStorage
+    Model ..> IGame
     Model ..> IGenerator
+    Model ..> IStorage
     View ..> Library
     View ..> IPresenter : request
 

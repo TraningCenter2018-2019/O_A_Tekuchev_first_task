@@ -1,32 +1,57 @@
 @startuml
 
+presenters.Presenter o-- views.IView
+views.View o-- presenters.IPresenter
+presenters.Presenter o-- model.ICrosswordBuffer
+presenters.Presenter o-- model.IGenerator
+
 package presenters {
     interface IPresenter
+
     class Presenter
 
     IPresenter <|-- Presenter
 }
 
-Presenter o-- views.IView
-views.View o-- IPresenter
-
 package views {
     interface IView
     interface IInput
     interface IOutput
+
     class ConsoleInput
     class ConsoleOutput
     class View
     
-    IView <|-- View    
-    View o-- IInput
-    View o-- IOutput    
+    IView <|-- View        
     IInput <|-- ConsoleInput
     IOutput <|-- ConsoleOutput
+
+    View o-- IInput
+    View o-- IOutput    
 }
 
 package model {
-    
+    interface ICrosswordBuffer
+    interface IGenerator
+    interface ICrossword
+    interface IGame
+    interface IWord
+
+    class CrosswordBuffer
+    class Generator
+    class Crossword
+    class Game
+    class Word
+
+    ICrosswordBuffer <|-- CrosswordBuffer
+    IGenerator <|-- Generator
+    ICrossword <|-- Crossword
+    IGame <|-- Game
+    IWord <|-- Word
+
+    CrosswordBuffer o-- ICrossword
+    Game o-- ICrossword
+    Crossword o-- IWord
 }
 
 @enduml
