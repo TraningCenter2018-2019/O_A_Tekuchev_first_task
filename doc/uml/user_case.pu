@@ -5,12 +5,26 @@ actor Creator
 actor System
 
 rectangle Application {
-    User -up--> (Resolve\ncrossword) 
-
-    Creator -up--> (Create\ncrosswords)
-
-    System -up--> (Manage\ncrosswords)    
     
+    User << Human >>    
+    User -down--> (Resolve\ncrossword) 
+    (Resolve\ncrossword) ..> (Input\npossible words) : include
+    (Resolve\ncrossword) ..> (Choose crossword) : include
+
+    (Choose crossword) ..> (Manage\ncrosswords)
+
+    System << Application >>
+    System -down--> (Manage\ncrosswords)
+    (Manage\ncrosswords) ..> (Push into storage)   
+    (Manage\ncrosswords) ..> (Pop from storage)
+
+    (Use generator\nalgorithm) ..> (Manage\ncrosswords)
+
+
+    Creator << Human >>    
+    Creator -down--> (Create\ncrosswords)
+    (Create\ncrosswords) ..> (Input\nkey words) : include
+    (Create\ncrosswords) ..> (Use generator\nalgorithm)
 
 }
 
