@@ -31,8 +31,23 @@ public class MainForm implements IForm {
     }
 
     @Override
-    public void setData(int[][] grid) {
+    public void createGrid(int rows, int columns) {
+        _mainWindow.createGrid(rows, columns);
+    }
 
+    @Override
+    public int getGridRows() {
+        return _mainWindow.getGridRows();
+    }
+
+    @Override
+    public int getGridColumns() {
+        return _mainWindow.getGridColumns();
+    }
+
+    @Override
+    public void setData(int[][] grid) {
+        _mainWindow.setDataToGrid(grid);
     }
 
     @Override
@@ -51,6 +66,11 @@ public class MainForm implements IForm {
     }
 
     @Override
+    public void setGridKeyPressHandler(IGridKeyPressHandler handler) {
+        _mainWindow.setGridHandler(handler);
+    }
+
+    @Override
     public String inputFromDialogWindow(String title, String description, String pattern, String errMsg, boolean isSmall) {
         var termSize = new TerminalSize(isSmall ? 10 : 50, isSmall ? 1 : 10);
         return new TextInputDialogBuilder()
@@ -60,6 +80,11 @@ public class MainForm implements IForm {
                 .setTextBoxSize(termSize)
                 .build()
                 .showDialog(_textGui);
+    }
+
+    @Override
+    public String inputFromDialogWindow(String title, String description, boolean isSmall) {
+        return inputFromDialogWindow(title, description, ".*", "", isSmall);
     }
 
     @Override

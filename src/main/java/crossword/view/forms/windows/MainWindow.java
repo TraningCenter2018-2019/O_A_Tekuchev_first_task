@@ -1,12 +1,17 @@
 package crossword.view.forms.windows;
 
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.table.Table;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import crossword.cli.ICommand;
 import crossword.view.formatters.IFormatter;
+import crossword.view.forms.IGridKeyPressHandler;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainWindow extends BasicWindow {
 
@@ -15,6 +20,10 @@ public class MainWindow extends BasicWindow {
     private Panel _gridPanel;
     private Panel _commandPanel;
     private TextBox _descriptionTxtBx;
+    private Table<String> _grid;
+    private int _gridRows;
+    private int _gridColumns;
+    private IGridKeyPressHandler _keyPressHandler;
 
     private IFormatter _formatter;
 
@@ -40,6 +49,9 @@ public class MainWindow extends BasicWindow {
         mainPanel.addComponent(right);
 
         setComponent(mainPanel);
+
+        handleInput(new KeyStroke(KeyType.Unknown));
+        addWindowListener(new KeyWindowsListener());
     }
 
     /**
@@ -61,12 +73,12 @@ public class MainWindow extends BasicWindow {
     private Panel getGridPanel() {
         var gridPanel = new Panel();
 
-        var welcom = new Table<Character>(getEmptyHeaders(9));
-        welcom.getTableModel().addRow(
-                '*', 'w', 'e', 'l', 'c', 'o', 'm', 'e', '*'
+        _grid = new Table<String>(getEmptyHeaders(9));
+        _grid.getTableModel().addRow(
+                "*", "w", "e", "l", "c", "o", "m", "e", "*"
         );
 
-        gridPanel.addComponent(welcom);
+        gridPanel.addComponent(_grid);
         return gridPanel;
     }
 
@@ -89,6 +101,52 @@ public class MainWindow extends BasicWindow {
         var commandPanel = new Panel();
 
         return commandPanel;
+    }
+
+    private void clearGrid() {
+        for (int i = _grid.getTableModel().getRowCount() - 1; i >= 0; --i) {
+            _grid.getTableModel().removeRow(i);
+        }
+    }
+
+    /**
+     * Создает сетку с заданным размером
+     *
+     * @param rows кол-во строк
+     * @param columns кол-во столбцов
+     */
+    public void createGrid(int rows, int columns) {
+        _gridPanel.removeAllComponents();
+        _grid = new Table<>(getEmptyHeaders(columns));
+        _gridRows = rows;
+        _gridColumns = columns;
+        _grid.setCellSelection(true);
+        _gridPanel.addComponent(_grid);
+    }
+
+    public int getGridRows() {
+        return _gridRows;
+    }
+
+    public int getGridColumns() {
+        return _gridColumns;
+    }
+
+    // !!!!
+    /**
+     * Устанавливает данные в сетку, пропуская из через форматтер
+     *
+     * @param data
+     */
+    public void setDataToGrid(int[][] data) {
+        clearGrid();
+        for (int i = 0; i < _gridRows; ++i) {
+            String[] row = new String[_gridColumns];
+            for (int j = 0; j < _gridColumns; ++j) {
+                row[j] = _formatter.format(data[i][j]);
+            }
+            _grid.getTableModel().addRow(row);
+        }
     }
 
     /**
@@ -123,6 +181,32 @@ public class MainWindow extends BasicWindow {
         for (String str : desc) {
             _descriptionTxtBx.addLine(str);
         }
+    }
+
+    public void setGridHandler(IGridKeyPressHandler handler) {
+        _keyPressHandler = handler;
+    }
+
+    class KeyWindowsListener implements WindowListener {
+
+        @Override
+        public void onResized(Window window, TerminalSize terminalSize, TerminalSize terminalSize1) { }
+
+        @Override
+        public void onMoved(Window window, TerminalPosition terminalPosition, TerminalPosition terminalPosition1) { }
+
+        @Override
+        public void onInput(Window window, KeyStroke keyStroke, AtomicBoolean atomicBoolean) {
+            if (_keyPressHandler == null || _grid == null || !_grid.isFocused() || keyStroke.getCharacter() == null) {
+                return;
+            }
+            int row = _grid.getSelectedRow();
+            int col = _grid.getSelectedColumn();
+            _keyPressHandler.keyPressed(keyStroke.getCharacter(), row, col);
+        }
+
+        @Override
+        public void onUnhandledInput(Window window, KeyStroke keyStroke, AtomicBoolean atomicBoolean) { }
     }
 
 }
