@@ -8,12 +8,19 @@ import crossword.view.forms.IForm;
 
 import java.util.regex.Pattern;
 
+/**
+ * Команда создания кроссворда
+ */
 public class CommandCreate extends AbstractFormCommand {
 
+    private IStorage<Crossword> _storage;
+    private ITranslator _translator;
     private ICrosswordGenerator _generator;
 
     public CommandCreate(IForm form, IStorage<Crossword> stor, ITranslator trans, ICrosswordGenerator gener) {
-        super(form, stor, trans);
+        super(form);
+        _storage = stor;
+        _translator = trans;
         _generator = gener;
     }
 
@@ -24,6 +31,7 @@ public class CommandCreate extends AbstractFormCommand {
 
     @Override
     public void execute() {
+        // ввод размера поля
         String demension = getForm().inputFromDialogWindow(
                 "Размер поля",
                 "Введите размеры поля через пробел",
@@ -38,6 +46,7 @@ public class CommandCreate extends AbstractFormCommand {
         int row = Integer.parseInt(matcher.group(1));
         int cols = Integer.parseInt(matcher.group(2));
 
+        // ввод кол-ва слов
         String strNumber = getForm().inputFromDialogWindow(
                 "Кол-во слов",
                 "Введите кол-во слов в кроссворде",
@@ -64,12 +73,17 @@ public class CommandCreate extends AbstractFormCommand {
 
         }
 
+        // создать кроссворд
         var crossword = _generator.generate( keyWords,row,cols);
-        var name = getForm().inputFromDialogWindow("Введите назавание кроссворда", "", true);
-        crossword.setName(name);
-        getStorage().add(crossword);
+
         getForm().createGrid(row,cols);
-        getForm().setData(getTranslator().translate(crossword));
+        getForm().setData(_translator.translate(crossword));
         getForm().setDescription(desc);
+
+        var name = getForm().inputFromDialogWindow("Сохранить", "Введите назавание", true);
+        if (name != null) {
+            crossword.setName(name);
+            _storage.add(crossword);
+        }
     }
 }

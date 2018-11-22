@@ -2,6 +2,8 @@ package crossword.view.forms;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -12,6 +14,9 @@ import crossword.view.forms.windows.MainWindow;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+/**
+ * Главная форма приложения
+ */
 public class MainForm implements IForm {
 
     DefaultTerminalFactory _terminalFactory;
@@ -88,11 +93,43 @@ public class MainForm implements IForm {
     }
 
     @Override
+    public Object selectFromActionDialog(String title, String description, Object[] items) {
+        var  builder = new ActionListDialogBuilder()
+                .setTitle(title)
+                .setDescription(description);
+        Object[] selected = new Object[1];
+        for (var item : items) {
+            builder.addAction(item.toString(), () -> selected[0] = item);
+        }
+        var t = builder.build().showDialog(_textGui);
+        return selected[0];
+    }
+
+    @Override
+    public void showMessage(String title, String text) {
+        new MessageDialogBuilder()
+                .setTitle(title)
+                .setText(text)
+                .build()
+                .showDialog(_textGui);
+    }
+
+    @Override
     public void show() {
         try {
             _screen.startScreen();
             _textGui = new MultiWindowTextGUI(_screen);
             _textGui.addWindowAndWait(_mainWindow);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            _screen.close();
         }
         catch (IOException e) {
             e.printStackTrace();

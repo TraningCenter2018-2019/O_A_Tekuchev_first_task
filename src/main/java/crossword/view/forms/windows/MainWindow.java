@@ -13,18 +13,35 @@ import crossword.view.forms.IGridKeyPressHandler;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Главное окно формы
+ */
 public class MainWindow extends BasicWindow {
 
     static private final int DESCRIPTION_TXTBX_WIDTH = 20;
 
+    // панель с сеткой
     private Panel _gridPanel;
+
+    // панель с командами
     private Panel _commandPanel;
+
+    // поле описания
     private TextBox _descriptionTxtBx;
+
+    // сетка
     private Table<String> _grid;
+
+    // кол-во строк в сетке
     private int _gridRows;
+
+    // кол-во столбцов в сетке
     private int _gridColumns;
+
+    // обоаботчик события на нажатие клавиши на сетке
     private IGridKeyPressHandler _keyPressHandler;
 
+    // преобразователь данных
     private IFormatter _formatter;
 
     public MainWindow() {
@@ -103,6 +120,9 @@ public class MainWindow extends BasicWindow {
         return commandPanel;
     }
 
+    /**
+     * Удаляет строки из сетки
+     */
     private void clearGrid() {
         for (int i = _grid.getTableModel().getRowCount() - 1; i >= 0; --i) {
             _grid.getTableModel().removeRow(i);
@@ -124,10 +144,20 @@ public class MainWindow extends BasicWindow {
         _gridPanel.addComponent(_grid);
     }
 
+    /**
+     * Возвращает кол-во строк в сетке
+     *
+     * @return
+     */
     public int getGridRows() {
         return _gridRows;
     }
 
+    /**
+     * Возвращает кол-во столбцов в сетке
+     *
+     * @return
+     */
     public int getGridColumns() {
         return _gridColumns;
     }
@@ -187,6 +217,9 @@ public class MainWindow extends BasicWindow {
         _keyPressHandler = handler;
     }
 
+    /**
+     * Обработчик событий формы
+     */
     class KeyWindowsListener implements WindowListener {
 
         @Override

@@ -3,6 +3,9 @@ package crossword.view.forms;
 import crossword.cli.ICommand;
 import crossword.view.formatters.IFormatter;
 
+/**
+ * Интерфейс формы
+ */
 public interface IForm {
 
     /**
@@ -13,8 +16,18 @@ public interface IForm {
      */
     void createGrid(int rows, int columns);
 
+    /**
+     * Возвращает кол-во строк в сетке
+     *
+     * @return
+     */
     int getGridRows();
 
+    /**
+     * Возвращает кол-во столбцов в сетке
+     *
+     * @return
+     */
     int getGridColumns();
 
     /**
@@ -76,7 +89,30 @@ public interface IForm {
     String inputFromDialogWindow(String title, String description, boolean isSmall);
 
     /**
-     * Отображение формы
+     * Предоставляет список объектов в отдельном окне
+     *
+     * @param title заголовок
+     * @param description описание
+     * @param items объекты списка
+     * @return выбранный объект или null при отмене
+     */
+    Object selectFromActionDialog(String title, String description, Object[] items);
+
+    /**
+     * Показывает сообщение в окошке
+     *
+     * @param title заголовок
+     * @param text тест сообщения
+     */
+    void showMessage(String title, String text);
+
+    /**
+     * Отобразить форму
      */
     void show();
+
+    /**
+     * Зыкрыть форму
+     */
+    void close();
 }

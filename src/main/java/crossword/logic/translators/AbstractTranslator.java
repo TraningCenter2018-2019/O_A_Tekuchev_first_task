@@ -5,12 +5,26 @@ import crossword.logic.internals.Word;
 
 import java.util.Arrays;
 
+/**
+ * Формат дынных представляет собой матрицу из целых значение, где
+ * каждый элемент матрицы представляет собой букву в сетке кроссворда
+ * младшие 16 бит - код буквы
+ * старшие 16 бит - номер слова у его первой буквы
+ */
 public abstract class AbstractTranslator implements ITranslator {
 
     static private int BIT_SHIFT = 16;
 
     protected abstract char getChar(char ch);
 
+    /**
+     * Закодировать слово
+     *
+     * @param grid матрица данных
+     * @param word кодируемое слово
+     * @param order его прдеполагаемый номер в на сетке
+     * @return реальный номер на сетке (если два слова начинаются на одну букву => у них один номер)
+     */
     private int codeWord(int grid[][], Word word, int order) {
         int len = word.length();
         int startNumber = order << BIT_SHIFT;

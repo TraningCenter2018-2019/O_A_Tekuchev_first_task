@@ -37,4 +37,9 @@ public class Crossword {
     public int getCountWords() {
         return _words.length;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }
