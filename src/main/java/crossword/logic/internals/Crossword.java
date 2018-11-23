@@ -3,43 +3,43 @@ package crossword.logic.internals;
 import java.util.Collection;
 
 public class Crossword {
-    private int _rows;
-    private int _cols;
-    private Word[] _words;
-    private String _name;
+  private int rows;
+  private int cols;
+  private Word[] words;
+  private String name;
 
-    public Crossword(int rows, int cols, Collection<Word> words) {
-        _rows = rows;
-        _cols = cols;
-        _words = words.toArray(new Word[]{});
-    }
+  public Crossword(int rows, int cols, Collection<Word> words) {
+    this.rows = rows;
+    this.cols = cols;
+    this.words = words.toArray(new Word[]{});
+  }
 
-    public void setName(String name) {
-        _name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public int getRows() {
-        return _rows;
-    }
+  public int getRows() {
+    return rows;
+  }
 
-    public int getColumns() {
-        return _cols;
-    }
+  public int getColumns() {
+    return cols;
+  }
 
-    public Word getWord(int ind) {
-        return _words[ind];
-    }
+  public Word getWord(int ind) {
+    return words[ind];
+  }
 
-    public String getName() {
-        return _name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public int getCountWords() {
-        return _words.length;
-    }
+  public int getCountWords() {
+    return words.length;
+  }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
+  @Override
+  public String toString() {
+    return getName();
+  }
 }

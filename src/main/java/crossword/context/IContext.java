@@ -1,5 +1,5 @@
 package crossword.context;
 
 public interface IContext {
-    void start();
+  void start();
 }

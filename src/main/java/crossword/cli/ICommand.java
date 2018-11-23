@@ -1,19 +1,19 @@
 package crossword.cli;
 
 /**
- *
+ * A console command interface
  */
 public interface ICommand {
 
-    /**
-     * Текстовое описание команды
-     *
-     * @return
-     */
-    String getDescription();
+  /**
+   * A text description of the command
+   *
+   * @return
+   */
+  String getDescription();
 
-    /**
-     * Выполнить команду
-     */
-    void execute();
+  /**
+   * Executes the command
+   */
+  void execute();
 }

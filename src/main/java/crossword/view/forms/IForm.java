@@ -4,115 +4,110 @@ import crossword.cli.ICommand;
 import crossword.view.formatters.IFormatter;
 
 /**
- * Интерфейс формы
+ * A form interface
  */
 public interface IForm {
 
-    /**
-     * Создает пустую сетку с заданным размером
-     *
-     * @param rows кол-во строк
-     * @param columns кол-во столбцов
-     */
-    void createGrid(int rows, int columns);
+  /**
+   * Creates an empty grid with the given size
+   *
+   * @param rows    the count of the rows
+   * @param columns the count of the columns
+   */
+  void createGrid(int rows, int columns);
 
-    /**
-     * Возвращает кол-во строк в сетке
-     *
-     * @return
-     */
-    int getGridRows();
+  /**
+   * Gets the count of the rows
+   *
+   * @return
+   */
+  int getGridRows();
 
-    /**
-     * Возвращает кол-во столбцов в сетке
-     *
-     * @return
-     */
-    int getGridColumns();
+  /**
+   * Gets the count of the columns
+   *
+   * @return
+   */
+  int getGridColumns();
 
-    /**
-     * Передает данные в форму для отображения на сетке
-     *
-     * @param grid данные сетки
-     */
-    void setData(int[][] grid);
+  /**
+   * Submits data to the form to show them on the grid
+   *
+   * @param grid the data
+   */
+  void setData(int[][] grid);
 
-    /**
-     * Устанавливает форматтер, который преобразует полученные данные в отображение на сетке
-     *
-     * @param formatter
-     */
-    void setFormatter(IFormatter formatter);
+  /**
+   * Устанавливает форматтер, который преобразует полученные данные в отображение на сетке
+   * Sets a formatter that converts the given data to the images on the grid
+   *
+   * @param formatter new formatter
+   */
+  void setFormatter(IFormatter formatter);
 
-    /**
-     * Устанавливает переданный текст в секцию описания формы
-     *
-     * @param desc текст описания
-     */
-    void setDescription(String ...desc);
+  /**
+   * Sets the given text to the description section
+   *
+   * @param desc text
+   */
+  void setDescription(String... desc);
 
-    /**
-     * Устанавливает команды в секцию команд формы
-     *
-     * @param commands команды
-     */
-    void setCommands(ICommand...commands);
+  /**
+   * Sets commands to the command section
+   *
+   * @param commands commands
+   */
+  void setCommands(ICommand... commands);
 
-    /**
-     * Устанавливает обработчик события на нажатие клавиши на сетке
-     *
-     * @param handler обработчки
-     * @see IGridKeyPressHandler
-     */
-    void setGridKeyPressHandler(IGridKeyPressHandler handler);
+  /**
+   * Sets an event handler on key press of the grid
+   *
+   * @param handler the event handler
+   */
+  void setGridKeyPressHandler(IGridKeyPressHandler handler);
 
-    /**
-     * Ввод строки из диалогового окна формы
-     *
-     * @param title заголовок окна
-     * @param description описание
-     * @param pattern шаблон ввода (регулярное выражение)
-     * @param errMsg сообщение пользователю, если его ввод не соответсвует шаблону
-     * @param isSmall если true, то окно - однострочное, иначе многострочное
-     * @return введенную строку или null, если пользователь отменил ввод
-     */
-    String inputFromDialogWindow(String title, String description, String  pattern, String errMsg, boolean isSmall);
+  /**
+   * Inputs a string from a dialog window
+   *
+   * @param title       the title of the windows
+   * @param description the description
+   * @param pattern     the pattern for user'r input (regexp)
+   * @param errMsg      the message fot a user if his/her input text does not match to the pattern
+   * @param isSmall     if true then the window will be one-line else multi-line
+   * @return input string or null if a user pressed cancel
+   */
+  String inputFromDialogWindow(String title, String description, String pattern, String errMsg, boolean isSmall);
 
-    /**
-     * Ввод строки из диалогового окна формы
-     *
-     * @param title заголовок окна
-     * @param description описание
-     * @param isSmall если true, то окно - однострочное, иначе многострочное
-     * @return введенную строку или null, если пользователь отменил ввод
-     */
-    String inputFromDialogWindow(String title, String description, boolean isSmall);
+  /**
+   *
+   */
+  String inputFromDialogWindow(String title, String description, boolean isSmall);
 
-    /**
-     * Предоставляет список объектов в отдельном окне
-     *
-     * @param title заголовок
-     * @param description описание
-     * @param items объекты списка
-     * @return выбранный объект или null при отмене
-     */
-    Object selectFromActionDialog(String title, String description, Object[] items);
+  /**
+   * Represent the list of the object in the separate window
+   *
+   * @param title       the title
+   * @param description the description
+   * @param items       the object to show
+   * @return selected object or null if a user pressed cancel
+   */
+  Object selectFromActionDialog(String title, String description, Object[] items);
 
-    /**
-     * Показывает сообщение в окошке
-     *
-     * @param title заголовок
-     * @param text тест сообщения
-     */
-    void showMessage(String title, String text);
+  /**
+   * Shows message in a window
+   *
+   * @param title the title
+   * @param text  the message
+   */
+  void showMessage(String title, String text);
 
-    /**
-     * Отобразить форму
-     */
-    void show();
+  /**
+   * Shows the form
+   */
+  void show();
 
-    /**
-     * Зыкрыть форму
-     */
-    void close();
+  /**
+   * Closes the form
+   */
+  void close();
 }

@@ -1,15 +1,15 @@
 package crossword.view.formatters;
 
 /**
- * Переводит полученные данные
+ *
  */
 public interface IFormatter {
 
-    /**
-     * Переводит полученные данные в удобочитаемый формат
-     *
-     * @param data данные
-     * @return строковое представление данных
-     */
-    String format(int data);
+  /**
+   * Convert the given data to show readable format
+   *
+   * @param data the data
+   * @return the string representation
+   */
+  String format(int data);
 }

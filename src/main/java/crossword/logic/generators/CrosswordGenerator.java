@@ -6,227 +6,239 @@ import crossword.logic.dictionaries.WordDictionary;
 
 import java.util.*;
 
+/**
+ * The crossword generator
+ */
 public class CrosswordGenerator implements ICrosswordGenerator {
+  static private final char EMPTY_CHAR = '\0';
+  static private final char LOCK_CHAR = '#';
 
-    static private final char EMPTY_CHAR = '\0';
-    static private final char LOCK_CHAR = '#';
+  WordDictionary dic;
 
-    private char[][] _matrix;
-    WordDictionary _dic;
+  /**
+   * Sets the word to the grid
+   * @param grid
+   * @param wrd
+   */
+  static private void setWord(char[][] grid, Word wrd) {
+    int len = wrd.length();
+    if (wrd.isHorizontal()) {
+      int row = wrd.getStartRow();
+      for (int i = wrd.getStartCol(); i < wrd.getStartCol() + len; ++i) {
+        grid[row][i] = wrd.getChar(i - wrd.getStartCol());
+      }
+      if (wrd.getStartCol() + len < grid[0].length) {
+        grid[row][wrd.getStartCol() + len] = LOCK_CHAR;
+      }
+    } else {
+      int col = wrd.getStartCol();
+      for (int i = wrd.getStartRow(); i < wrd.getStartRow() + len; ++i) {
+        grid[i][col] = wrd.getChar(i - wrd.getStartRow());
+      }
+      if (wrd.getStartRow() + len < grid.length) {
+        grid[wrd.getStartRow() + len][col] = LOCK_CHAR;
+      }
+    }
+  }
+
+  /**
+   * Creates an empty crossword grid
+   * @param rows
+   * @param cols
+   * @return
+   */
+  static private char[][] createEmptyGrid(int rows, int cols) {
+    char[][] matr = new char[rows][];
+    for (int i = 0; i < rows; ++i) {
+      matr[i] = new char[cols];
+      Arrays.fill(matr[i], EMPTY_CHAR);
+    }
+    return matr;
+  }
+
+  static private void printMatrix(char[][] matr) {
+    for (char[] str : matr) {
+      for (char lett : str) {
+        System.out.print(lett + " ");
+      }
+      System.out.println();
+    }
+  }
+
+  /**
+   * creates the copy of the grid
+   * @param matr
+   * @return
+   */
+  static private char[][] copy(char[][] matr) {
+    char[][] copied = new char[matr.length][];
+    for (int i = 0; i < matr.length; ++i) {
+
+      copied[i] = matr[i].clone();
+    }
+    return copied;
+  }
+
+  /**
+   * Gets word with a given length by a given mask
+   *
+   * @param masks the mask
+   * @param len   the word length
+   * @param used  the list of used words
+   * @return the list of compatible words
+   */
+  private Collection<String> getWordsByMask(Map<Character, List<Integer>> masks, int len, Set<String> used) {
+    Set<String> set = dic.getWordsByLetters(masks);
+    Set<String> filteredSet = new HashSet<String>();
+    for (String word : set) {
+      if (word.length() == len && !used.contains(word)) {
+        filteredSet.add(word);
+      }
+    }
+    return filteredSet;
+  }
 
 
-    static private void setWord(char[][] matr, Word wrd) {
-        int len = wrd.length();
-        if (wrd.isHorizontal()) {
-            int row = wrd.getStartRow();
-            for (int i = wrd.getStartCol(); i < wrd.getStartCol() + len; ++i) {
-                matr[row][i] = wrd.getChar(i - wrd.getStartCol());
-            }
-            if (wrd.getStartCol() + len < matr[0].length) {
-                matr[row][wrd.getStartCol() + len] = LOCK_CHAR;
-            }
-        }
-        else {
-            int col = wrd.getStartCol();
-            for (int i = wrd.getStartRow(); i < wrd.getStartRow() + len; ++i) {
-                matr[i][col] = wrd.getChar(i - wrd.getStartRow());
-            }
-            if (wrd.getStartRow() + len < matr.length) {
-                matr[wrd.getStartRow() + len][col] = LOCK_CHAR;
-            }
-        }
+  /**
+   * Tries to intersect words from
+   *
+   * @param grid               the crossword grid
+   * @param currWord             the current word
+   * @param usedWordsValues      the used words
+   * @param maxCount             the max count of words in the crossword
+   * @param currChainWord        the set word in the crossword
+   * @param biggestChainWordList the list with the maximum chain of word that have been placed on the grid
+   * @return true if all words were placed
+   */
+  private boolean findWords(char[][] grid, Word currWord, Set<String> usedWordsValues, int maxCount,
+                            List<Word> currChainWord, LinkedList<Word> biggestChainWordList) {
+
+    // whether the current word is horizontal
+    boolean isHor = currWord.isHorizontal();
+
+    // the grid size
+    int size = isHor ? grid.length : grid[0].length;
+
+    // if the cord is bigger than the grid
+    if (currWord.length() > size) {
+      return false;
     }
 
-    static private char[][] createEmptyMatrix(int rows, int cols) {
-        var matr = new char[rows][];
-        for (int i = 0; i < rows; ++i) {
-            matr[i] = new char[cols];
-            Arrays.fill(matr[i], EMPTY_CHAR);
-        }
-        return matr;
+    // add the word in used list
+    usedWordsValues.add(currWord.getValue());
+
+    // set the word on the grid
+    setWord(grid, currWord);
+
+    // add the word in the current chain
+    currChainWord.add(currWord);
+
+    // if the current chain if bigger than max one
+    // set the current chain as maximum
+    if (currChainWord.size() > biggestChainWordList.size()) {
+      biggestChainWordList.clear();
+      biggestChainWordList.addAll(currChainWord);
     }
-
-    static private void printMatrix(char[][] matr) {
-        for (char[] str : matr) {
-            for (char lett : str) {
-                System.out.print(lett + " ");
-            }
-            System.out.println();
-        }
-    }
-
-    static private char[][] copy(char[][] matr) {
-        char[][] copied = new char[matr.length][];
-        for (int i = 0; i < matr.length; ++i) {
-
-            copied[i] = matr[i].clone();
-        }
-        return copied;
-    }
-
-    /**
-     * Возвращет слова заданной длины по переданной маске (буква - позиция)
-     *
-     * @param masks маска
-     * @param len длина слова
-     * @param used список использованных
-     * @return список подходящих слов
-     */
-    private Collection<String> getWordsByMask(Map<Character, List<Integer>> masks, int len, Set<String> used) {
-        var set = _dic.getWordsByLetters(masks);
-        var filteredSet = new HashSet<String>();
-        for (String word : set) {
-            if (word.length() == len && !used.contains(word)) {
-                filteredSet.add(word);
-            }
-        }
-        return filteredSet;
-    }
-
-
-    /**
-     * Выполняет рекурсивный поиск подходящих слов относительно текущего
-     *
-     * @param matrix поле кроссворда
-     * @param currWord текущее слово, по которому идет поиск
-     * @param usedWordsValues задействованные слова
-     * @param maxCount макс. кол-во возможных слов в кроссворде
-     * @param currChainWord текущие слова в кроссворде
-     * @param biggestChainWordList список с наибольшим кол-вом установленных когда-либо слов в кроссворде
-     * @return true если удалось установить все слова, иначе false
-     */
-    private boolean findWords(char[][] matrix, Word currWord, Set<String> usedWordsValues, int maxCount,
-                              List<Word> currChainWord, LinkedList<Word> biggestChainWordList) {
-
-        // является ли текущее слово горизонтальным
-        boolean isHor = currWord.isHorizontal();
-
-        // размер сетки
-        int size = isHor ? matrix.length : matrix[0].length;
-
-        // если слово не влезает в сетку
-        if (currWord.length() > size) {
-            return false;
-        }
-
-        // добавляем слово в список использованных
-        usedWordsValues.add(currWord.getValue());
-
-        // устанавливаем слово на сетку
-        setWord(matrix, currWord);
-
-        // добавляем слово в текущую цепочку
-        currChainWord.add(currWord);
-
-        // если текущая цепочка больше предыдущей максимальной
-        // поставить текущую как максимальную
-        if (currChainWord.size() > biggestChainWordList.size()) {
-            biggestChainWordList.clear();
-            biggestChainWordList.addAll(currChainWord);
-        }
 
         /*printMatrix(matrix);
         System.out.println("----");*/
 
-        // если были использованы все слова, то завершить алгоритм
-        if (usedWordsValues.size() == maxCount) {
-            return true;
-        }
-
-        // установить начальный индекс, по которому будет итерироваться слово
-        // либо по-вертикали, либо по-горизонтали
-        int startIndex = isHor ? currWord.getStartCol() : currWord.getStartRow();
-
-        // установить предельный индекс, с которого может начинаться приставленное слово
-        int startMaskLimit = isHor ? currWord.getStartRow() : currWord.getStartCol();
-
-        // перебрать все буквы слова
-        for (int i = startIndex; i < currWord.length(); ++i) {
-
-            // первый указатель - индекс начала слова
-            for (int j = 0; j <= startMaskLimit; ++j) {
-
-                // маски для поиска слов для текущего пересечения
-                var masks = new HashMap<Character, List<Integer>>();
-
-                // второй указатель - индекс конца слова
-                for (int k = j; k < size; ++k) {
-                    // текущая клетка сетки
-                    char currCell = isHor ? matrix[k][i] : matrix[i][k];
-
-                    // если текущая клетка это "черная клетка", то прекратить перебор
-                    if (currCell == LOCK_CHAR) {
-                        break;
-                    }
-
-                    // если в текущей клетке стоит буква, то положить ее в маску
-                    if (currCell != EMPTY_CHAR) {
-                        if (!masks.containsKey(currCell)) {
-                            masks.put(currCell, new ArrayList<>());
-                        }
-                        masks.get(currCell).add(k - j);
-                    }
-
-                    char nextCell = EMPTY_CHAR;
-                    if (k < size - 1) {
-                        nextCell = isHor ? matrix[k + 1][i] : matrix[i][k + 1];
-                    }
-
-                    // если второй указатель "перешагнул" через слово
-                    // и при этом следующий за ним символ - не буква
-                    if (k >= startMaskLimit &&
-                            (k == size - 1 || nextCell == EMPTY_CHAR || nextCell == LOCK_CHAR)) {
-
-                        // получить всевозможные слова по составленным масками
-                        var words = getWordsByMask(masks, k - j + 1, usedWordsValues);
-                        // скопировать текущую сетку
-                        char[][] cop = copy(matrix);
-                        // вызвать алгоритм рекурсивно для каждого из найденных слов
-                        for (String wrd : words) {
-                            var newWrd = isHor ? new Word(wrd, j, i, !isHor) : new Word(wrd, i, j, !isHor);
-                            setWord(cop, newWrd);
-                            if (findWords(cop, newWrd, usedWordsValues, maxCount, currChainWord, biggestChainWordList)) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // удалить слово из текущей цепи
-        currChainWord.remove(currWord);
-
-        // удалить из использованных
-        usedWordsValues.remove(currWord.getValue());
-        return false;
+    // if all word have been used finish the algorithm
+    if (usedWordsValues.size() == maxCount) {
+      return true;
     }
 
-    @Override
-    public Crossword generate(String[] keyWords, int countRows, int countCols) {
-//        _matrix = createEmptyMatrix(countRows, countCols);
-//
-//        char[][] matrCopy = copy(_matrix);
-        _dic = new WordDictionary(keyWords);
-        var usedWordsValues = new HashSet<String>();
-        var currChainWord = new LinkedList<Word>();
-        var biggestChainWordList = new LinkedList<Word>();
+    // set the initial index to iterate by the word
+    // either horizontal or vertical
+    int startIndex = isHor ? currWord.getStartCol() : currWord.getStartRow();
 
-        Arrays.sort(keyWords, (String o1, String o2) -> o2.length() - o1.length());
+    // set the limit index from which the new word can start
+    int startMaskLimit = isHor ? currWord.getStartRow() : currWord.getStartCol();
 
-        for (String wrd : keyWords) {
-            var matrix = createEmptyMatrix(countRows, countCols);
-            if (findWords(
-                    matrix,
-                    new Word(wrd, countRows / 2, 0, true),
-                    usedWordsValues,
-                    keyWords.length,
-                    currChainWord,
-                    biggestChainWordList)) {
+    // for every letter in the current word
+    for (int i = startIndex; i < currWord.length(); ++i) {
 
-                break;
+      // the first pointer is the start index of the new word
+      for (int j = 0; j <= startMaskLimit; ++j) {
+
+        // the masks for the new word
+        Map<Character, List<Integer>> masks = new HashMap<>();
+
+        // the second pointer is the end index of the new word
+        for (int k = j; k < size; ++k) {
+          // the current cell
+          char currCell = isHor ? grid[k][i] : grid[i][k];
+
+          // if the current cell is "black"
+          if (currCell == LOCK_CHAR) {
+            break;
+          }
+
+          // if the current cell has a letter add it to the mask
+          if (currCell != EMPTY_CHAR) {
+            if (!masks.containsKey(currCell)) {
+              masks.put(currCell, new ArrayList<>());
             }
+            masks.get(currCell).add(k - j);
+          }
+
+          char nextCell = EMPTY_CHAR;
+          if (k < size - 1) {
+            nextCell = isHor ? grid[k + 1][i] : grid[i][k + 1];
+          }
+
+          // if the second pointer has gone over the word
+          // and the next cell is not a letter
+          if (k >= startMaskLimit &&
+              (k == size - 1 || nextCell == EMPTY_CHAR || nextCell == LOCK_CHAR)) {
+
+            // get all word by mask
+            Collection<String> words = getWordsByMask(masks, k - j + 1, usedWordsValues);
+            // cope the current grid
+            char[][] cop = copy(grid);
+            // call the algorithm recursivly
+            for (String wrd : words) {
+              Word newWrd = isHor ? new Word(wrd, j, i, !isHor) : new Word(wrd, i, j, !isHor);
+              setWord(cop, newWrd);
+              if (findWords(cop, newWrd, usedWordsValues, maxCount, currChainWord, biggestChainWordList)) {
+                return true;
+              }
+            }
+          }
         }
-        return new Crossword(countRows, countCols, biggestChainWordList);
+      }
     }
+
+    // remove the word from the current chain
+    currChainWord.remove(currWord);
+
+    // remove the one from the list of used
+    usedWordsValues.remove(currWord.getValue());
+    return false;
+  }
+
+  @Override
+  public Crossword generate(String[] keyWords, int countRows, int countCols) {
+    dic = new WordDictionary(keyWords);
+    Set<String> usedWordsValues = new HashSet<>();
+    LinkedList<Word> currChainWord = new LinkedList<>();
+    LinkedList<Word> biggestChainWordList = new LinkedList<>();
+
+    Arrays.sort(keyWords, (String o1, String o2) -> o2.length() - o1.length());
+
+    for (String wrd : keyWords) {
+      char[][] matrix = createEmptyGrid(countRows, countCols);
+      if (findWords(
+          matrix,
+          new Word(wrd, countRows / 2, 0, true),
+          usedWordsValues,
+          keyWords.length,
+          currChainWord,
+          biggestChainWordList)) {
+
+        break;
+      }
+    }
+    return new Crossword(countRows, countCols, biggestChainWordList);
+  }
 }

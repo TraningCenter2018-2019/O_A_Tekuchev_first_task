@@ -1,9 +1,21 @@
 package crossword.logic.storages;
 
+/**
+ * A storage interface
+ * @param <T> data to store
+ */
 public interface IStorage<T> extends Iterable<T> {
-    void add(T item);
+  /**
+   * Adds object to storage
+   * @param item
+   */
+  void add(T item);
 
-    int getCount();
+  /**
+   * Gets the count of the elements
+   * @return
+   */
+  int getCount();
 
-    T find(IPredicate<T> predicate);
+  T find(IPredicate<T> predicate);
 }

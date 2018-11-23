@@ -1,42 +1,73 @@
 package crossword.logic.internals;
 
+/**
+ * The word representation in a crossword
+ */
 public class Word {
-    private int _startRow;
+  // the start row position
+  private int startRow;
 
-    private int _startCol;
+  // the start column position
+  private int startCol;
 
-    private String _value;
+  // the word itself
+  private String value;
 
-    private boolean _isHorizontal;
+  // whether the word is places horizontal
+  private boolean isHorizontal;
 
-    public Word(String value, int sX, int sY, boolean isHor) {
-        _value = value;
-        _startRow = sX;
-        _startCol = sY;
-        _isHorizontal = isHor;
-    }
+  public Word(String value, int sX, int sY, boolean isHor) {
+    this.value = value;
+    startRow = sX;
+    startCol = sY;
+    isHorizontal = isHor;
+  }
 
-    public String getValue() {
-        return _value;
-    }
+  /**
+   * Gets the word itself
+   * @return
+   */
+  public String getValue() {
+    return value;
+  }
 
-    public int length() {
-        return _value.length();
-    }
+  /**
+   * Gets the length of the word
+   * @return
+   */
+  public int length() {
+    return value.length();
+  }
 
-    public int getStartRow() {
-        return _startRow;
-    }
+  /**
+   * Gets the start row position
+   * @return
+   */
+  public int getStartRow() {
+    return startRow;
+  }
+  /**
+   * Gets the start column position
+   * @return
+   */
+  public int getStartCol() {
+    return startCol;
+  }
 
-    public int getStartCol() {
-        return _startCol;
-    }
+  /**
+   * Get the word char
+   * @param ind the char position
+   * @return
+   */
+  public char getChar(int ind) {
+    return value.charAt(ind);
+  }
 
-    public char getChar(int ind) {
-        return _value.charAt(ind);
-    }
-
-    public boolean isHorizontal() {
-        return _isHorizontal;
-    }
+  /**
+   * Gets whether the word is horizontal
+   * @return
+   */
+  public boolean isHorizontal() {
+    return isHorizontal;
+  }
 }

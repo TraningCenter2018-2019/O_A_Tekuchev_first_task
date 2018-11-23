@@ -6,102 +6,101 @@ import crossword.logic.translators.ITranslator;
 import crossword.view.forms.IForm;
 
 /**
- * Команда разгадывания кроссворда
+ * The resolve crossword command
  */
 public class CommandPlay extends AbstractFormCommand {
 
-    // текущая сетка
-    private int[][] _currGrid;
+  // the current grid
+  private int[][] currGrid;
 
-    // сетка с ответами
-    private int[][] _answerGrid;
+  // the answer grid
+  private int[][] answerGrid;
 
-    // хранилище кроссвордов
-    private IStorage<Crossword> _storage;
+  // the crossword storage
+  private IStorage<Crossword> storage;
 
-    // транслятор скрывающий буквы
-    private ITranslator _translatorHidden;
+  // the translator that hides letters
+  private ITranslator translatorHidden;
 
-    // транслятор показывающий буквы
-    private ITranslator _translatorShowed;
+  // the translator that shows letters
+  private ITranslator translatorShowed;
 
-    public CommandPlay(IForm form, IStorage<Crossword> stor, ITranslator transHid, ITranslator transShow) {
-        super(form);
-        _storage = stor;
-        _translatorHidden = transHid;
-        _translatorShowed = transShow;
+  public CommandPlay(IForm form, IStorage<Crossword> stor, ITranslator transHid, ITranslator transShow) {
+    super(form);
+    storage = stor;
+    translatorHidden = transHid;
+    translatorShowed = transShow;
+  }
+
+  /**
+   * Checks whether the crossword is solved correctly
+   *
+   * @return true if it is else - false
+   */
+  private boolean check() {
+    for (int i = 0; i < currGrid.length; ++i) {
+      for (int j = 0; j < currGrid[i].length; ++j) {
+        if (currGrid[i][j] != answerGrid[i][j]) {
+          return false;
+        }
+      }
     }
+    return true;
+  }
 
-    /**
-     * Проверяет правильность решения кроссворда
-     *
-     * @return true если кроссворд решен верно
-     */
-    private boolean check() {
-        for (int i = 0; i < _currGrid.length; ++i) {
-            for (int j = 0; j < _currGrid[i].length; ++j) {
-                if (_currGrid[i][j] != _answerGrid[i][j]) {
-                    return false;
-                }
-            }
-        }
-        return true;
+  /**
+   * Event handler on key press on the grid
+   *
+   * @param key the pressed key
+   * @param row the row index
+   * @param col the column index
+   */
+  void keyPress(char key, int row, int col) {
+    if (key == '\n') {
+      if (check()) {
+        getForm().showMessage("Сообщение", "Кроссворд решен верно");
+      } else {
+        getForm().showMessage("Сообщение", "Кроссворд решен не верно");
+      }
+      return;
     }
-
-    /**
-     * Обработчик события на нажатие клавиши на сетке
-     *
-     * @param key нажатая клавиша
-     * @param row индекс строки
-     * @param col индекс столбца
-     */
-    void keyPress(char key, int row, int col) {
-        if (key == '\n') {
-            if (check()) {
-                getForm().showMessage("Сообщение","Кроссворд решен верно");
-            }
-            else {
-                getForm().showMessage("Сообщение","Кроссворд решен не верно");
-            }
-            return;
-        }
-        if (_currGrid[row][col] == 0) {
-            return;
-        }
-        _currGrid[row][col] &= 2147418112;
-        _currGrid[row][col] += key;
-        getForm().setData(_currGrid);
-
+    if (currGrid[row][col] == 0) {
+      return;
     }
+    currGrid[row][col] &= 2147418112;
+    currGrid[row][col] += key;
+    getForm().setData(currGrid);
 
-    @Override
-    public String getDescription() {
-        return "играть";
-    }
+  }
 
-    @Override
-    public void execute() {
-        if (_storage.getCount() == 0) {
-            getForm().showMessage("Сообщение", "Список кроссвордов пуст");
-            return;
-        }
-        var crossWords = new Crossword[_storage.getCount()];
-        int count = 0;
-        for (var cross : _storage) {
-            crossWords[count++] = cross;
-        }
-        Crossword playingCross = (Crossword) getForm().selectFromActionDialog(
-                "Доступные кроссворды",
-                "Выберите кроссворд",
-                crossWords
-        );
-        if (playingCross == null) {
-            return;
-        }
-        getForm().createGrid(playingCross.getRows(),playingCross.getColumns());
-        _currGrid = _translatorHidden.translate(playingCross);
-        _answerGrid = _translatorShowed.translate(playingCross);
-        getForm().setData(_currGrid);
-        getForm().setGridKeyPressHandler(this::keyPress);
+  @Override
+  public String getDescription() {
+    return "играть";
+  }
+
+  @Override
+  public void execute() {
+    if (storage.getCount() == 0) {
+      getForm().showMessage("Сообщение", "Список кроссвордов пуст");
+      return;
     }
+    Crossword[] crossWords = new Crossword[storage.getCount()];
+    int count = 0;
+    for (Crossword cross : storage) {
+      crossWords[count++] = cross;
+    }
+    Crossword playingCross = (Crossword) getForm().selectFromActionDialog(
+        "Доступные кроссворды",
+        "Выберите кроссворд",
+        crossWords
+    );
+    if (playingCross == null) {
+      return;
+    }
+    getForm().createGrid(playingCross.getRows(), playingCross.getColumns());
+    currGrid = translatorHidden.translate(playingCross);
+    answerGrid = translatorShowed.translate(playingCross);
+    getForm().setData(currGrid);
+    getForm().setGridKeyPressHandler(this::keyPress);
+  }
 }
